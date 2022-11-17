@@ -1,0 +1,128 @@
+﻿@model Room.Models.RoomDataViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+@{
+    int itemcount = 1;
+}
+
+<div class="container">
+    <button id="startButton">Start</button>
+    <button id="stopButton">Stop</button>
+</div>
+
+
+
+<div class="container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Sr No</th>
+                <th>Room Code</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+
+            @if (Model.RoomCodeList != null && Model.RoomCodeList.Count() > 0)
+            {
+                itemcount = Model.RoomCodeList.Count();
+                foreach (var items in Model.RoomCodeList)
+                {
+                    <tr>
+                        <td>@itemcount</td>
+                        <td>@items.RoomId</td>
+                    </tr>
+                    itemcount--;
+                }
+                @*itemcount = Model.RoomCodeList.Count();*@
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+@section Scripts{
+    <script>
+
+
+
+        $(document).ready(function () {
+            var counter = 1;
+            var isStartInsert = false;
+
+            $('#startButton').click(function () {
+                isStartInsert = true;
+                $("#startButton").prop("disabled", true);
+                $("#stopButton").removeAttr('disabled');
+                if (isStartInsert == true) {
+                    $.ajax({
+                        type: 'GET',
+                        //dataType: "json",
+                        url: "/api/RoomApi/GetRoomIdAsync",
+                        success: function (data) {
+                            console.log(data);
+                            insertRoomId(data);
+                        },
+                        Error: function () {
+                            alert("error");
+                        }
+                    });
+                }
+            });
+
+
+            function insertRoomId(roomId) {
+                $.ajax({
+                    type: "post",
+                    url: `/api/RoomApi/InsertRoomId?roomId=${roomId}`,
+                    success: function (response) {
+                        console.log(response);
+                        //alert(response.message);
+                        //alert(response.roomId);
+                        if (response.message == "Save Successfully") {
+                            //debugger;
+                            var htmlbody = "<tr><td>" + (@Model?.RoomCodeList?.Count()+counter) + "</td><td>" + response.roomId + "</td></tr>";
+                            tableBody = $("table tbody");
+                            //tableBody.append(htmlbody);
+                            tableBody.prepend(htmlbody);
+                            counter++;
+
+                            if (isStartInsert == true) {
+                                $("#startButton").trigger("click");
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error.responseText);
+                        alert("Error Occured", "please Try Again.");
+                    },
+
+                });
+            }
+
+
+            $('#stopButton').click(function () {
+
+                isStartInsert = false
+                //alert('Stop');
+                $("#startButton").removeAttr('disabled');
+                $("#stopButton").prop("disabled", true);
+
+            });
+
+
+
+        });
+
+
+
+
+    </script>
+}
