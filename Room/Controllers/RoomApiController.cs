@@ -75,7 +75,7 @@ namespace Room.Controllers
 
                     if (response != null)
                     {
-                        var a = response.FirstOrDefault()?.RoomId;
+                        //var a = response.FirstOrDefault()?.RoomId;
 
                         return new JsonResult(new
                         {
