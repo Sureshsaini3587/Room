@@ -41,14 +41,12 @@ namespace Room.Controllers
                 {
                     using (var response = await httpClient.GetAsync("http://194.233.69.20:3001/api/roomcode"))
                     {
+
                         dynamic apiResponse = await response.Content.ReadAsStringAsync();
                         dynamic jResult = JsonConvert.DeserializeObject(apiResponse).room_code;
                         string test = jResult;
+                        //string test = "undefined";
                         return Ok(test);
-                        ////return new JsonResult(new
-                        ////{
-                        ////    jResult,
-                        ////});
                     }
                 }
                 catch (Exception ex)
@@ -69,26 +67,30 @@ namespace Room.Controllers
             {
                 using (IDbConnection dbConnection = Connection)
                 {
-                    dbConnection.Open();
-                    var response = dbConnection.Query<RoomData>("Sp_InsertRoomId", new { @roomId = roomId },
-                        commandType: CommandType.StoredProcedure);
-
-                    if (response != null)
+                    if (roomId != "undefined")
                     {
-                        //var a = response.FirstOrDefault()?.RoomId;
+                        dbConnection.Open();
+                        var response = dbConnection.Query<RoomData>("Sp_InsertRoomId", new { @roomId = roomId },
+                            commandType: CommandType.StoredProcedure);
 
-                        return new JsonResult(new
+                        if (response != null)
                         {
-                            Message = "Save Successfully",
-                            RoomId = response.FirstOrDefault()?.RoomId,
-                        });
+                            //var a = response.FirstOrDefault()?.RoomId;
 
+                            return new JsonResult(new
+                            {
+                                Message = "Save Successfully",
+                                RoomId = response.FirstOrDefault()?.RoomId,
+                            });
+
+                        }
+                        dbConnection.Close();
                     }
-                    dbConnection.Close();
+
 
                     return new JsonResult(new
                     {
-                        Message = response?.FirstOrDefault(),
+                        Message = "undefined value",
                     });
 
 

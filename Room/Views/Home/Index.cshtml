@@ -66,7 +66,13 @@
                         url: "/api/RoomApi/GetRoomIdAsync",
                         success: function (data) {
                             console.log(data);
-                            insertRoomId(data);
+                            debugger;
+                            if (data != 'undefined') {
+                                insertRoomId(data);
+                            } else {
+                                $("#startButton").trigger("click");
+                            }
+
                         },
                         Error: function () {
                             alert("error");
@@ -77,6 +83,9 @@
 
 
             function insertRoomId(roomId) {
+
+
+
                 $.ajax({
                     type: "post",
                     url: `/api/RoomApi/InsertRoomId?roomId=${roomId}`,
@@ -86,6 +95,9 @@
                         //alert(response.roomId);
                         if (response.message == "Save Successfully") {
                             //debugger;
+                            //if (response.roomId == 'undefined') {
+                            //    alert(response.roomId);
+                            //}
                             var htmlbody = "<tr><td>" + (@Model?.RoomCodeList?.Count()+counter) + "</td><td>" + response.roomId + "</td></tr>";
                             tableBody = $("table tbody");
                             //tableBody.append(htmlbody);
@@ -96,7 +108,9 @@
                                 $("#startButton").trigger("click");
                             }
                         } else {
-                            alert(response.message);
+                            $("#startButton").trigger("click");
+                            //alert(response.message);
+
                         }
                     },
                     error: function (error) {
